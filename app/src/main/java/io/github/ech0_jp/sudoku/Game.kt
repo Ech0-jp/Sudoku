@@ -2,6 +2,7 @@ package io.github.ech0_jp.sudoku
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import java.util.*
 
 class Game : AppCompatActivity() {
@@ -39,10 +40,9 @@ class Game : AppCompatActivity() {
         else if (difficulty == "Expert")
             squaresToRemove = 59
 
-        sudoku = sudokuComplete
-        for (i in 1..squaresToRemove) {
-            sudoku.removeAt(i - 1)
-        }
+        sudoku.addAll(sudokuComplete)
+        for (i in 1..squaresToRemove)
+            sudoku[GetRandom(0, 80)] = Square(Value = -1)
     }
 
     fun GenerateGrid(){
@@ -51,16 +51,15 @@ class Game : AppCompatActivity() {
         var available: MutableList<MutableList<Int>> = mutableListOf()
         var count = 0
 
-        for (x in 0..81){
+        for (x in 0..80){
+            squares.add(Square())
             available.add(x, mutableListOf())
-            for (i in 1..9){
-                available[x].add(i)
-            }
+            for (i in 1..9) available[x].add(i)
         }
 
         while (count != 81){
-            if(available[count].count() != 0){
-                val i = GetRandom(0, available[count].count() - 1)
+            if(available[count].size != 0){
+                val i = GetRandom(0, available[count].size - 1)
                 val z = available[count][i]
                 if (!Conflicts(squares.toTypedArray(), Item(count, z))) {
                     squares[count] = Item(count, z)
@@ -88,18 +87,13 @@ class Game : AppCompatActivity() {
     }
 
     private fun GetRandom(min: Int, max: Int): Int{
+        if (max == 0) return 0
         val rand = Random()
         return rand.nextInt(max) + min
     }
 
     private fun Conflicts(currentValues: Array<Square>, test: Square): Boolean{
-        for (value in currentValues){
-            if ((value.Across != 0 && value.Across == test.Across) || (value.Down != 0 && value.Down == test.Down) || (value.Region != 0 && value.Region == test.Region)){
-                if (value.Value == test.Value)
-                    return true
-            }
-        }
-        return false
+        return currentValues.any { ((it.Across != 0 && it.Across == test.Across) || (it.Down != 0 && it.Down == test.Down) || (it.Region != 0 && it.Region == test.Region)) && it.Value == test.Value }
     }
 
     private fun Item(n: Int, v: Int): Square {
@@ -122,8 +116,8 @@ class Game : AppCompatActivity() {
     }
 
     private fun GetRegionFromNumber(n: Int): Int{
-        var a: Int = GetAcrossFromNumber(n)
-        var d: Int = GetDownFromNumber(n)
+        val a: Int = GetAcrossFromNumber(n)
+        val d: Int = GetDownFromNumber(n)
 
         if (a in 1..3 && d in 1..3)
             return 1
