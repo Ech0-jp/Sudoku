@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Sudoku</string>
+    <string name="options">Options</string>
+    <string name="stats">Stats</string>
+    <string name="new_game">New Game</string>
+    <string name="resume">Resume</string>
+    <string name="sudoku">Sudoku</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
 </resources>
