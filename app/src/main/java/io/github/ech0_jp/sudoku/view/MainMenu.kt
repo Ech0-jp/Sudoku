@@ -1,10 +1,10 @@
-package io.github.ech0_jp.sudoku
+package io.github.ech0_jp.sudoku.view
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import io.github.ech0_jp.sudoku.R
 
 class MainMenu : AppCompatActivity() {
 

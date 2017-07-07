@@ -1,33 +1,47 @@
-package io.github.ech0_jp.sudoku
+package io.github.ech0_jp.sudoku.game
 
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
+import io.github.ech0_jp.sudoku.view.SudokuCell
 import java.util.*
 
-class Game : AppCompatActivity() {
-    class Square(var Across: Int = 0,
-                 var Down: Int = 0,
-                 var Region: Int = 0,
-                 var Value: Int = 0,
-                 var Index: Int = 0)
-
-    private lateinit var difficulty: String
-    private var sudokuComplete: MutableList<Square> = mutableListOf()
-    private var sudoku: MutableList<Square> = mutableListOf()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val intent = intent
-        difficulty = intent.extras["difficulty"] as String
-        GenerateGrid()
-        GenerateBoard()
-
-        setContentView(R.layout.activity_game)
+class SudokuGameManager {
+    private object _instance { var instance = SudokuGameManager() }
+    companion object {
+        val instance: SudokuGameManager by lazy { _instance.instance }
     }
 
-    fun GenerateBoard(){
+    private var sudokuComplete: MutableList<SudokuGameCell> = mutableListOf()
+    private var sudoku: MutableList<SudokuGameCell> = mutableListOf()
+
+    private var _selectedCell: SudokuCell? = null
+    var selectedCell: SudokuCell?
+        get() = _selectedCell
+        set(value){
+            if (_selectedCell != null) _selectedCell!!.invalidate()
+            _selectedCell = value
+            if (_selectedCell != null) _selectedCell!!.invalidate()
+        }
+
+    fun GetValue(index: Int): SudokuGameCell{
+        return sudoku[index]
+    }
+
+    fun SetValue(index: Int, value: Int){
+        sudoku[index].Value = value
+    }
+
+    //<editor-fold desc="Game Generation">
+    fun NewGame(difficulty: String){
+        Clear()
+        GenerateGrid()
+        GenerateBoard(difficulty)
+    }
+
+    private fun Clear(){
+        sudokuComplete.clear()
+        sudoku.clear()
+    }
+
+    private fun GenerateBoard(difficulty: String){
         var squaresToRemove: Int = 0
         if (difficulty == "Breezy")
             squaresToRemove = 33
@@ -41,18 +55,21 @@ class Game : AppCompatActivity() {
             squaresToRemove = 59
 
         sudoku.addAll(sudokuComplete)
-        for (i in 1..squaresToRemove)
-            sudoku[GetRandom(0, 80)] = Square(Value = -1)
+        for (i in 1..squaresToRemove) {
+            val index = GetRandom(0, 80)
+            sudoku[index].Value = 0
+            sudoku[index].Changeable = true
+        }
     }
 
     fun GenerateGrid(){
         Clear()
-        var squares: MutableList<Square> = mutableListOf()
+        var squares: MutableList<SudokuGameCell> = mutableListOf()
         var available: MutableList<MutableList<Int>> = mutableListOf()
         var count = 0
 
         for (x in 0..80){
-            squares.add(Square())
+            squares.add(SudokuGameCell())
             available.add(x, mutableListOf())
             for (i in 1..9) available[x].add(i)
         }
@@ -72,7 +89,7 @@ class Game : AppCompatActivity() {
                 for (i in 1..9){
                     available[count].add(i)
                 }
-                squares[count - 1] = Square()
+                squares[count - 1] = SudokuGameCell()
                 count -= 1
             }
         }
@@ -81,23 +98,18 @@ class Game : AppCompatActivity() {
             sudokuComplete.add(squares[i].Index, squares[i])
     }
 
-    fun Clear(){
-        sudokuComplete.clear()
-        sudoku.clear()
-    }
-
     private fun GetRandom(min: Int, max: Int): Int{
         if (max == 0) return 0
         val rand = Random()
         return rand.nextInt(max) + min
     }
 
-    private fun Conflicts(currentValues: Array<Square>, test: Square): Boolean{
+    private fun Conflicts(currentValues: Array<SudokuGameCell>, test: SudokuGameCell): Boolean{
         return currentValues.any { ((it.Across != 0 && it.Across == test.Across) || (it.Down != 0 && it.Down == test.Down) || (it.Region != 0 && it.Region == test.Region)) && it.Value == test.Value }
     }
 
-    private fun Item(n: Int, v: Int): Square {
-        return Square(GetAcrossFromNumber(n + 1), GetDownFromNumber(n + 1), GetRegionFromNumber(n + 1), v, n)
+    private fun Item(n: Int, v: Int): SudokuGameCell {
+        return SudokuGameCell(GetAcrossFromNumber(n + 1), GetDownFromNumber(n + 1), GetRegionFromNumber(n + 1), v, n)
     }
 
     private fun GetAcrossFromNumber(n: Int): Int{
@@ -138,4 +150,5 @@ class Game : AppCompatActivity() {
         else // a in 7..9 && d in 7..9
             return 9
     }
+    //</editor-fold>
 }

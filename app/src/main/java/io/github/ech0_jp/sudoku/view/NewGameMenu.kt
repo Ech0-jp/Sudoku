@@ -1,4 +1,4 @@
-package io.github.ech0_jp.sudoku
+package io.github.ech0_jp.sudoku.view
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
