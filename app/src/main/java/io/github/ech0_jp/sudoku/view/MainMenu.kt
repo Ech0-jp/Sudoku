@@ -13,6 +13,7 @@ class MainMenu : AppCompatActivity() {
         setContentView(R.layout.activity_main_menu)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun NewGame_OnClick(view: View): Unit {
         val intent = Intent(this, NewGameMenu::class.java)
         startActivity(intent)

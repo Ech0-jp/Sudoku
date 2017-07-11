@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -13,13 +12,23 @@ import io.github.ech0_jp.sudoku.game.SudokuGameCell
 import io.github.ech0_jp.sudoku.game.SudokuGameManager
 
 class SudokuCell(context: Context, attributes: AttributeSet): View(context, attributes) {
-    private var cell: SudokuGameCell = SudokuGameCell()
+    private var _cell: SudokuGameCell = SudokuGameCell()
+    var cell = _cell
+        get() = _cell
+
+    private var _relatedCells: MutableList<SudokuCell> = mutableListOf()
     private var number: String = ""
+    var cellSelected: Boolean = false
+    var highlightNumber: Boolean = false
 
     private val paint: Paint = Paint()
 
+    fun SetRelatedCells(relatedCells: MutableList<SudokuCell>){
+        _relatedCells = relatedCells
+    }
+
     fun SetNumber(sudokuCell: SudokuGameCell){
-        cell = sudokuCell
+        _cell = sudokuCell
         number = sudokuCell.Value.toString()
         if(sudokuCell.Value == 0)
             number = ""
@@ -27,47 +36,77 @@ class SudokuCell(context: Context, attributes: AttributeSet): View(context, attr
         invalidate()
     }
 
+    fun SetNumber(number: Int){
+        _cell.Value = number
+        this.number = number.toString()
+        if (number == 0)
+            this.number = ""
+
+        invalidate()
+    }
+
     fun SetColor(){
-        if (cell.Region % 2 == 1){
-            val bg = background as GradientDrawable
-            bg.setColor(Color.GRAY)
+        if (_cell.Region % 2 == 1){
+            setBackgroundColor(Color.GRAY)
         } else {
-            val bg = background as GradientDrawable
-            bg.setColor(Color.WHITE)
+            setBackgroundColor(Color.WHITE)
         }
     }
 
+    fun SetColor(color: Int){
+        setBackgroundColor(color)
+    }
+
     fun onClick(){
-        val prev = SudokuGameManager.instance.selectedCell
-        SudokuGameManager.instance.selectedCell = this
-        invalidate()
-        if (prev != null)
-            prev!!.invalidate()
+        SudokuGameManager.instance.Cell_OnClick(this)
+    }
+
+    fun HighlightRelated(){
+        if (cellSelected) {
+            SetColor(Color.WHITE)
+            for (r in _relatedCells) {
+                r.SetColor(Color.LTGRAY)
+            }
+        }
+        else {
+            SetColor()
+            for (r in _relatedCells) {
+                r.SetColor()
+            }
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
         onDraw_SetNumber(canvas)
+        onDraw_SetBorder(canvas)
     }
 
     fun onDraw_SetNumber(canvas: Canvas?){
-        if (SudokuGameManager.instance.selectedCell != null){
-            if (SudokuGameManager.instance.selectedCell!!.equals(this)){
-                Log.d("onDraw_SetNumber", "Selected cell is this ${cell.Index} !")
-                paint.color = Color.BLUE
-            }
-        }
-        else{
-            Log.d("", "Not selected cell")
-            paint.color = Color.BLACK
-        }
+        if (cellSelected || highlightNumber) paint.color = Color.parseColor("#0087ff")
+        else paint.color = Color.BLACK
         paint.textSize = 60F
+        paint.style = Paint.Style.FILL
 
         val rect = Rect()
         paint.getTextBounds(number, 0, number.length, rect)
 
         canvas!!.drawText(number, (width - rect.width()) / 2F, (height + rect.height()) / 2F, paint)
+    }
+
+    private fun onDraw_SetBorder(canvas: Canvas?) {
+        if (cellSelected) {
+            paint.color = Color.parseColor("#0087ff")
+            paint.strokeWidth = 10F
+        }
+        else {
+            paint.color = Color.BLACK
+            paint.strokeWidth = 5F
+        }
+        paint.style = Paint.Style.STROKE
+
+        canvas!!.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -77,6 +116,6 @@ class SudokuCell(context: Context, attributes: AttributeSet): View(context, attr
     override fun equals(other: Any?): Boolean {
         if (other !is SudokuCell)
             return false
-        return cell.Index == other.cell.Index
+        return _cell.Index == other._cell.Index
     }
 }

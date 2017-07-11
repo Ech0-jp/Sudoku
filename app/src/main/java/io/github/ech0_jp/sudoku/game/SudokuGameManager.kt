@@ -1,5 +1,12 @@
 package io.github.ech0_jp.sudoku.game
 
+import android.app.Application
+import android.content.Context
+import android.util.AttributeSet
+import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Toast
+import io.github.ech0_jp.sudoku.R
 import io.github.ech0_jp.sudoku.view.SudokuCell
 import java.util.*
 
@@ -9,17 +16,18 @@ class SudokuGameManager {
         val instance: SudokuGameManager by lazy { _instance.instance }
     }
 
+    private lateinit var context: Context
+
+    private var sudokuCells: MutableList<SudokuCell> = mutableListOf()
     private var sudokuComplete: MutableList<SudokuGameCell> = mutableListOf()
     private var sudoku: MutableList<SudokuGameCell> = mutableListOf()
+    private var numbersLeft: Int = 0
 
     private var _selectedCell: SudokuCell? = null
-    var selectedCell: SudokuCell?
-        get() = _selectedCell
-        set(value){
-            if (_selectedCell != null) _selectedCell!!.invalidate()
-            _selectedCell = value
-            if (_selectedCell != null) _selectedCell!!.invalidate()
-        }
+
+    fun GetCell(index: Int): SudokuCell{
+        return sudokuCells[index]
+    }
 
     fun GetValue(index: Int): SudokuGameCell{
         return sudoku[index]
@@ -29,11 +37,61 @@ class SudokuGameManager {
         sudoku[index].Value = value
     }
 
+    fun AssignGameContext(context: Context){
+        this.context = context
+    }
+
+    fun Cell_OnClick(cell: SudokuCell){
+        if (_selectedCell != null) {
+            _selectedCell!!.cellSelected = false
+            _selectedCell!!.HighlightRelated()
+            sudokuCells.filter { _selectedCell!!.cell.Value == it.cell.Value }
+                       .forEach { it.highlightNumber = false; it.invalidate() }
+            _selectedCell!!.invalidate()
+        }
+        if (_selectedCell != null && _selectedCell!!.equals(cell)) {
+            _selectedCell = null
+            return
+        }
+        _selectedCell = cell
+        _selectedCell!!.cellSelected = true
+        _selectedCell!!.HighlightRelated()
+        sudokuCells.filter { _selectedCell!!.cell.Value == it.cell.Value }
+                   .forEach { it.highlightNumber = true; it.invalidate() }
+        _selectedCell!!.invalidate()
+    }
+
+    fun btn_OnClick(number: Int){
+        if (_selectedCell == null || !_selectedCell!!.cell.Changeable || _selectedCell!!.cell.Value == number) return
+
+        SetValue(_selectedCell!!.cell.Index, number)
+        _selectedCell!!.SetNumber(number)
+
+        if (number == 0)
+            numbersLeft++
+        else
+            numbersLeft--
+
+        if (numbersLeft == 0){
+            if (CheckComplete())
+                Toast.makeText(context, "Game is complete", Toast.LENGTH_LONG).show()
+            else
+                Toast.makeText(context, "Game is NOT complete", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun CheckComplete(): Boolean{
+        return sudokuComplete
+                .filterIndexed { index, value -> !value.equals(sudoku[index]) }
+                .none()
+    }
+
     //<editor-fold desc="Game Generation">
-    fun NewGame(difficulty: String){
+    fun NewGame(difficulty: String, context: Context, attributeSet: AttributeSet){
         Clear()
         GenerateGrid()
         GenerateBoard(difficulty)
+        GenerateCells(context, attributeSet)
     }
 
     private fun Clear(){
@@ -41,28 +99,7 @@ class SudokuGameManager {
         sudoku.clear()
     }
 
-    private fun GenerateBoard(difficulty: String){
-        var squaresToRemove: Int = 0
-        if (difficulty == "Breezy")
-            squaresToRemove = 33
-        else if (difficulty == "Easy")
-            squaresToRemove = 47
-        else if (difficulty == "Medium")
-            squaresToRemove = 49
-        else if (difficulty == "Hard")
-            squaresToRemove = 55
-        else if (difficulty == "Expert")
-            squaresToRemove = 59
-
-        sudoku.addAll(sudokuComplete)
-        for (i in 1..squaresToRemove) {
-            val index = GetRandom(0, 80)
-            sudoku[index].Value = 0
-            sudoku[index].Changeable = true
-        }
-    }
-
-    fun GenerateGrid(){
+    private fun GenerateGrid(){
         Clear()
         var squares: MutableList<SudokuGameCell> = mutableListOf()
         var available: MutableList<MutableList<Int>> = mutableListOf()
@@ -96,6 +133,46 @@ class SudokuGameManager {
 
         for (i in 0..80)
             sudokuComplete.add(squares[i].Index, squares[i])
+    }
+
+    private fun GenerateBoard(difficulty: String){
+        if (difficulty == "Beginner")
+            numbersLeft = 33
+        else if (difficulty == "Easy")
+            numbersLeft = 5 //33
+        else if (difficulty == "Medium")
+            numbersLeft = 49
+        else if (difficulty == "Hard")
+            numbersLeft = 55
+        else if (difficulty == "Expert")
+            numbersLeft = 59
+
+        sudoku.addAll(sudokuComplete)
+        for (i in 1..numbersLeft) {
+            val index = GetRandom(0, 80)
+            sudoku[index].Value = 0
+            sudoku[index].Changeable = true
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun GenerateCells(context: Context, attributeSet: AttributeSet){
+        for (v in sudoku){
+            val cell = LayoutInflater.from(context).inflate(R.layout.cell, null, false) as SudokuCell
+            cell.SetNumber(v)
+            cell.SetColor()
+            cell.setOnClickListener {
+                cell.onClick()
+            }
+            sudokuCells.add(cell)
+        }
+
+        for (v in sudokuCells){
+            val related: MutableList<SudokuCell> = sudokuCells
+                    .filter { v.cell.Index != it.cell.Index && (v.cell.Down == it.cell.Down || v.cell.Across == it.cell.Across || v.cell.Region == it.cell.Region) }
+                    .toMutableList()
+            v.SetRelatedCells(related)
+        }
     }
 
     private fun GetRandom(min: Int, max: Int): Int{

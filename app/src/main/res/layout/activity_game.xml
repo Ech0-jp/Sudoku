@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".view.Game">
 
     <io.github.ech0_jp.sudoku.view.SudokuGridView
@@ -11,5 +12,77 @@
         android:layout_height="wrap_content"
         android:numColumns="9"
         android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"/>
-</android.support.constraint.ConstraintLayout>
+        android:horizontalSpacing="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="1"
+            android:text="1"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="2"
+            android:text="2"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="3"
+            android:text="3"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="4"
+            android:text="4"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="5"
+            android:text="5"
+            android:onClick="btn_OnClick"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="6"
+            android:text="6"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="7"
+            android:text="7"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="8"
+            android:text="8"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="9"
+            android:text="9"
+            android:onClick="btn_OnClick"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:tag="0"
+            android:text="Clr"
+            android:onClick="btn_OnClick"/>
+    </LinearLayout>
+</LinearLayout>
