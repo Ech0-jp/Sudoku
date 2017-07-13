@@ -19,9 +19,11 @@
         android:layout_marginTop="15dp"/>
 
     <Button
+        android:id="@+id/btn_Resume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/resume" />
+        android:text="@string/resume"
+        android:onClick="Resume_OnClick"/>
 
     <Button
         android:layout_width="match_parent"
@@ -32,7 +34,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/stats" />
+        android:text="@string/stats"
+        android:onClick="Stats_OnClick"/>
 
     <Button
         android:layout_width="match_parent"
