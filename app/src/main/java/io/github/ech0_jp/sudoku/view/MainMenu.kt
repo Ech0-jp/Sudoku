@@ -23,10 +23,10 @@ class MainMenu : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun Resume_OnClick(view: View){
-//        val intent = Intent(this, Game::class.java)
-//        intent.putExtra("Resume", true)
-//        startActivity(intent)
-        SudokuGameManager.instance.LoadGame(this)
+        val intent = Intent(this, Game::class.java)
+        intent.putExtra("Resume", true)
+        startActivity(intent)
+        //SudokuGameManager.instance.LoadGame(this)
     }
 
     @Suppress("UNUSED_PARAMETER")

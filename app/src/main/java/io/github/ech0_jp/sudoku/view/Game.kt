@@ -17,13 +17,11 @@ class Game : AppCompatActivity() {
 
         val resume: Boolean? = intent.extras["Resume"] as Boolean?
         if (resume != null && resume){
-            SudokuGameManager.instance.LoadGame(this)
+            SudokuGameManager.instance.LoadGame(this, Xml.asAttributeSet(resources.getXml(R.layout.cell)))
             difficulty = SudokuGameManager.instance.GetDifficulty()
-            SudokuGameManager.instance.AssignGameContext(this)
         } else {
             difficulty = intent.extras["difficulty"] as String
-            SudokuGameManager.instance.NewGame(difficulty, applicationContext, Xml.asAttributeSet(resources.getXml(R.layout.cell)))
-            SudokuGameManager.instance.AssignGameContext(this)
+            SudokuGameManager.instance.NewGame(difficulty, this, Xml.asAttributeSet(resources.getXml(R.layout.cell)))
         }
 
         setContentView(R.layout.activity_game)

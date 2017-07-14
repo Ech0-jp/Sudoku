@@ -19,7 +19,7 @@ class SudokuGameManager {
     }
 
     private lateinit var context: Context
-    private lateinit var _difficulty: String
+    private var _difficulty: String = ""
     fun GetDifficulty(): String { return _difficulty }
 
     private var sudokuCells: MutableList<SudokuCell> = mutableListOf()
@@ -39,10 +39,6 @@ class SudokuGameManager {
 
     fun SetValue(index: Int, value: Int){
         sudoku[index].Value = value
-    }
-
-    fun AssignGameContext(context: Context){
-        this.context = context
     }
 
     //<editor-fold desc="OnClick">
@@ -96,6 +92,7 @@ class SudokuGameManager {
     fun NewGame(difficulty: String, context: Context, attributeSet: AttributeSet){
         Clear()
         _difficulty = difficulty
+        this.context = context
         GenerateGrid()
         GenerateBoard(difficulty)
         GenerateCells(context, attributeSet)
@@ -111,8 +108,8 @@ class SudokuGameManager {
 
             file.appendText("<SudokuGameManager>")
             file.appendText(XmlParser.ToXml("_difficulty", _difficulty))
-            file.appendText(XmlParser.ToXml("sudokuComplete", sudokuComplete))
-            file.appendText(XmlParser.ToXml("sudoku", sudoku))
+            file.appendText(XmlParser.ToXml("sudokuComplete", sudokuComplete.toTypedArray()))
+            file.appendText(XmlParser.ToXml("sudoku", sudoku.toTypedArray()))
             file.appendText(XmlParser.ToXml("numbersLeft", numbersLeft))
             file.appendText("</SudokuGameManager>")
             return true
@@ -122,29 +119,7 @@ class SudokuGameManager {
         }
     }
 
-    fun SaveGame_OLD(): Boolean{
-        try {
-            val filePath: String = context.filesDir.path + "/Sudoku_SaveGame"
-            Log.d("SudokuGameManager", "Saving game to: $filePath")
-            val out: FileOutputStream = FileOutputStream(filePath, false)
-            val file: File = File(filePath)
-
-            if (file.exists()) file.delete()
-            file.createNewFile()
-
-            file.appendText("difficulty: $_difficulty\n")
-            file.appendText("sudokuComplete:\n")
-            for (s in sudokuComplete) file.appendText(s.toString() + "\n")
-            file.appendText("sudoku:\n")
-            for (s in sudoku) file.appendText(s.toString() + "\n")
-            return true
-        } catch (e: Exception){
-            Log.e("SudokuGameManager", "Failed to saved game..\n${e.message}")
-            return false
-        }
-    }
-
-    fun LoadGame(context: Context): Boolean {
+    fun LoadGame(context: Context, attributeSet: AttributeSet): Boolean {
         try {
             val filePath: String = context.filesDir.path + "/Sudoku_SaveGame"
             Log.d("SudokuGameManager", "Loading game from: $filePath")
@@ -152,14 +127,23 @@ class SudokuGameManager {
             val file: File = File(filePath)
             if (!file.exists()) return false
 
-            val lines = file.readLines()
-            Log.d("SudokuGameManager", "lines.length = ${lines.size}")
-            val ind = lines.indexOf("difficulty:")
-            Log.d("SudokuGameManager", "index: $ind, line: ${if (ind != -1)lines[ind] else "N/A"}")
+            val fileText = file.readText()
+
+            val tmpDifficulty = XmlParser.FromXml(fileText, "_difficulty", _difficulty) ?: throw Exception("difficulty is null!")
+            val tmpSudokuComplete = XmlParser.FromXml(fileText, "sudokuComplete", SudokuGameCell().javaClass) ?: throw Exception("sudokuComplete is null!")
+            val tmpSudoku = XmlParser.FromXml(fileText, "sudoku", SudokuGameCell().javaClass) ?: throw Exception("sudoku is null!")
+            val tmpNumbersLeft = XmlParser.FromXml(fileText, "numbersLeft", numbersLeft) ?: throw Exception("numbersLeft is null!")
+
+            this.context = context
+            _difficulty = tmpDifficulty.toString()
+            sudokuComplete.addAll(tmpSudokuComplete)
+            sudoku.addAll(tmpSudoku)
+            numbersLeft = tmpNumbersLeft as Int
+            GenerateCells(context, attributeSet)
 
             return true
         } catch (e: Exception) {
-            Log.e("SudokuGameManager", "Failed to load game..\n$e")
+            Log.e("SudokuGameManager", "Failed to load game..\nMessage:${e.message}\nError:$e")
             return false
         }
     }
@@ -167,6 +151,7 @@ class SudokuGameManager {
     private fun Clear(){
         sudokuComplete.clear()
         sudoku.clear()
+        sudokuCells.clear()
     }
 
     private fun GenerateGrid(){
