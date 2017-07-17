@@ -37,7 +37,7 @@ class XmlParser{
             val doc = builder.parse(ByteArrayInputStream(xml.toByteArray()))
             doc.documentElement.normalize()
             val element = getData(doc.documentElement.getElementsByTagName(nodeName))
-            if (element.first() == null) {
+            if (element.isEmpty() || element.first() == null) {
                 Log.d("XmlParser", "Could not find element by name of '$nodeName'")
                 return null
             }

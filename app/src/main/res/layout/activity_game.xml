@@ -7,6 +7,12 @@
     android:orientation="vertical"
     tools:context=".view.Game">
 
+    <TextView
+        android:id="@+id/tv_Timer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"/>
+
     <io.github.ech0_jp.sudoku.view.SudokuGridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -17,7 +17,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.NewGameMenu" />
-        <activity android:name=".view.Game"></activity>
+        <activity android:name=".view.Game" />
+        <activity android:name=".view.GameOver" />
+        <activity android:name=".view.Statistics"></activity>
     </application>
 
 </manifest>

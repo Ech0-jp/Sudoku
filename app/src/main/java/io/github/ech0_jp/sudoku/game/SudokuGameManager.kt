@@ -4,12 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.Toast
 import io.github.ech0_jp.sudoku.R
 import io.github.ech0_jp.sudoku.Util.XmlParser
 import io.github.ech0_jp.sudoku.view.SudokuCell
 import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 class SudokuGameManager {
@@ -17,6 +15,8 @@ class SudokuGameManager {
     companion object {
         val instance: SudokuGameManager by lazy { _instance.instance }
     }
+
+    val SAVE_FILE_NAME = "/Sudoku_SaveGame"
 
     private lateinit var context: Context
     private var _difficulty: String = ""
@@ -33,12 +33,14 @@ class SudokuGameManager {
         return sudokuCells[index]
     }
 
-    fun GetValue(index: Int): SudokuGameCell{
-        return sudoku[index]
-    }
-
     fun SetValue(index: Int, value: Int){
         sudoku[index].Value = value
+    }
+
+    fun GameComplete(): Boolean{
+        if (numbersLeft > 0) return false
+        else return sudokuComplete.filterIndexed { index, value -> !value.equals(sudoku[index]) }
+                                  .none()
     }
 
     //<editor-fold desc="OnClick">
@@ -47,7 +49,7 @@ class SudokuGameManager {
             _selectedCell!!.cellSelected = false
             _selectedCell!!.HighlightRelated()
             sudokuCells.filter { _selectedCell!!.cell.Value == it.cell.Value }
-                       .forEach { it.highlightNumber = false; it.invalidate() }
+                    .forEach { it.highlightNumber = false; it.invalidate() }
             _selectedCell!!.invalidate()
         }
         if (_selectedCell != null && _selectedCell!!.equals(cell)) {
@@ -58,12 +60,13 @@ class SudokuGameManager {
         _selectedCell!!.cellSelected = true
         _selectedCell!!.HighlightRelated()
         sudokuCells.filter { _selectedCell!!.cell.Value == it.cell.Value }
-                   .forEach { it.highlightNumber = true; it.invalidate() }
+                .forEach { it.highlightNumber = true; it.invalidate() }
         _selectedCell!!.invalidate()
     }
 
     fun btn_OnClick(number: Int){
-        if (_selectedCell == null || !_selectedCell!!.cell.Changeable || _selectedCell!!.cell.Value == number) return
+        if (_selectedCell == null || !_selectedCell!!.cell.Changeable || _selectedCell!!.cell.Value == number)
+            return
 
         SetValue(_selectedCell!!.cell.Index, number)
         _selectedCell!!.SetNumber(number)
@@ -72,21 +75,8 @@ class SudokuGameManager {
             numbersLeft++
         else
             numbersLeft--
-
-        if (numbersLeft == 0){
-            if (CheckComplete())
-                Toast.makeText(context, "Game is complete", Toast.LENGTH_LONG).show()
-            else
-                Toast.makeText(context, "Game is NOT complete", Toast.LENGTH_LONG).show()
-        }
     }
     //</editor-fold>
-
-    private fun CheckComplete(): Boolean{
-        return sudokuComplete
-                .filterIndexed { index, value -> !value.equals(sudoku[index]) }
-                .none()
-    }
 
     //<editor-fold desc="Game Generation">
     fun NewGame(difficulty: String, context: Context, attributeSet: AttributeSet){
@@ -100,7 +90,7 @@ class SudokuGameManager {
 
     fun SaveGame(): Boolean {
         try {
-            val filePath: String = context.filesDir.path + "/Sudoku_SaveGame"
+            val filePath: String = context.filesDir.path + SAVE_FILE_NAME
             Log.d("SudokuGameManager", "Saving game to: $filePath")
             val file: File = File(filePath)
             if (file.exists()) file.delete()
@@ -121,7 +111,7 @@ class SudokuGameManager {
 
     fun LoadGame(context: Context, attributeSet: AttributeSet): Boolean {
         try {
-            val filePath: String = context.filesDir.path + "/Sudoku_SaveGame"
+            val filePath: String = context.filesDir.path + SAVE_FILE_NAME
             Log.d("SudokuGameManager", "Loading game from: $filePath")
 
             val file: File = File(filePath)
@@ -143,7 +133,7 @@ class SudokuGameManager {
 
             return true
         } catch (e: Exception) {
-            Log.e("SudokuGameManager", "Failed to load game..\nMessage:${e.message}\nError:$e")
+            Log.e("SudokuGameManager", "Failed to load game..\n${e.message}")
             return false
         }
     }
@@ -194,7 +184,7 @@ class SudokuGameManager {
         if (difficulty == "Beginner")
             numbersLeft = 33
         else if (difficulty == "Easy")
-            numbersLeft = 5 //33
+            numbersLeft = 1 //33
         else if (difficulty == "Medium")
             numbersLeft = 49
         else if (difficulty == "Hard")
