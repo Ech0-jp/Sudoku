@@ -1,5 +1,6 @@
 package io.github.ech0_jp.sudoku.view
 
+import android.app.ActionBar
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,9 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Xml
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import io.github.ech0_jp.sudoku.R
 import io.github.ech0_jp.sudoku.Util.Statistics.StatisticsManager
 import io.github.ech0_jp.sudoku.game.SudokuGameManager
@@ -33,9 +37,37 @@ class Game : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_game)
+        CreateButtons()
         if (resume == null || !resume)
             _startTime = System.currentTimeMillis()
         handler.post(runnable())
+    }
+
+    fun CreateButtons() {
+        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        for (i in 1..9) {
+            val btn = Button(this)
+            btn.text = i.toString()
+            btn.tag = i
+
+            btn.setOnClickListener { btn_OnClick(btn) }
+            LinearButtonLayout.addView(btn, params)
+
+            val btnParams = btn.layoutParams
+            btnParams.width = 105
+            btnParams.height = 160
+            btn.layoutParams = btnParams
+        }
+
+        val toggleParams = tb_Notes.layoutParams
+        toggleParams.width = 105
+        toggleParams.height = 160
+        tb_Notes.layoutParams = toggleParams
+
+        val backParams = btn_Back.layoutParams
+        backParams.width = 105
+        backParams.height = 160
+        btn_Back.layoutParams = backParams
     }
 
     fun SetTime(time: Long) {

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,11 +13,13 @@
         <Button
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:text="Legacy Stats"/>
+            android:text="@string/legacy_stats"
+            tools:ignore="ButtonStyle" />
         <Button
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:text="Stats"/>
+            android:text="@string/stats"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
 
     <TableLayout
@@ -29,17 +30,17 @@
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <TextView android:text="Difficulty" android:layout_marginLeft="20dp"/>
-            <TextView android:text="Best Time" android:layout_marginLeft="20dp"/>
-            <TextView android:text="Avg. Time" android:layout_marginLeft="20dp"/>
-            <TextView android:text="Games" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/difficulty" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/best_time" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/avg_time" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/games" android:layout_marginLeft="20dp"/>
         </TableRow>
 
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-            <TextView android:text="Beginner" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/beginner" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyBestTimeBeginner" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyAvgTimeBeginner" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyGamesBeginner" android:textAlignment="center" android:layout_marginLeft="20dp"/>
@@ -49,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-            <TextView android:text="Easy" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/easy" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyBestTimeEasy" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyAvgTimeEasy" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyGamesEasy" android:textAlignment="center" android:layout_marginLeft="20dp"/>
@@ -59,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-            <TextView android:text="Medium" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/medium" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyBestTimeMedium" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyAvgTimeMedium" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyGamesMedium" android:textAlignment="center" android:layout_marginLeft="20dp"/>
@@ -69,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-            <TextView android:text="Hard" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/hard" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyBestTimeHard" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyAvgTimeHard" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyGamesHard" android:textAlignment="center" android:layout_marginLeft="20dp"/>
@@ -79,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-            <TextView android:text="Expert" android:layout_marginLeft="20dp"/>
+            <TextView android:text="@string/expert" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyBestTimeExpert" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyAvgTimeExpert" android:textAlignment="center" android:layout_marginLeft="20dp"/>
             <TextView android:id="@+id/tv_LegacyGamesExpert" android:textAlignment="center" android:layout_marginLeft="20dp"/>
@@ -89,6 +90,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Reset"
+        android:text="@string/reset"
         android:onClick="Reset_OnClick"/>
 </LinearLayout>
