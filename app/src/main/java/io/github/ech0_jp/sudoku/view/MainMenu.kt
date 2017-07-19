@@ -14,28 +14,40 @@ class MainMenu : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StatisticsManager.instance.Init(this)
+        if (!StatisticsManager.instance.initialized)
+            StatisticsManager.instance.Init(this)
         setContentView(R.layout.activity_main_menu)
         val filePath: String = this.filesDir.path + SudokuGameManager.instance.SAVE_FILE_NAME
         btn_Resume.isEnabled = File(filePath).exists()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            val filePath: String = this.filesDir.path + SudokuGameManager.instance.SAVE_FILE_NAME
+            btn_Resume.isEnabled = File(filePath).exists()
+        }
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun Resume_OnClick(view: View){
         val intent = Intent(this, Game::class.java)
         intent.putExtra("Resume", true)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         startActivity(intent)
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun NewGame_OnClick(view: View) {
         val intent = Intent(this, NewGameMenu::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         startActivity(intent)
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun Stats_OnClick(view: View) {
         val intent = Intent(this, Statistics::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         startActivity(intent)
     }
 

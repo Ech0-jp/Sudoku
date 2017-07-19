@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import io.github.ech0_jp.sudoku.R
 import io.github.ech0_jp.sudoku.Util.XmlParser
+import io.github.ech0_jp.sudoku.view.Game
 import io.github.ech0_jp.sudoku.view.SudokuCell
 import java.io.File
 import java.util.*
@@ -64,17 +65,23 @@ class SudokuGameManager {
         _selectedCell!!.invalidate()
     }
 
-    fun btn_OnClick(number: Int){
-        if (_selectedCell == null || !_selectedCell!!.cell.Changeable || _selectedCell!!.cell.Value == number)
+    fun btn_OnClick(number: Int, isNote: Boolean){
+        if (_selectedCell == null || !_selectedCell!!.cell.Changeable || (number == 0 && _selectedCell!!.cell.Value == 0))
             return
 
-        SetValue(_selectedCell!!.cell.Index, number)
-        _selectedCell!!.SetNumber(number)
-
-        if (number == 0)
-            numbersLeft++
-        else
-            numbersLeft--
+        if (isNote) {
+            _selectedCell!!.AddNote(number)
+        } else {
+            if ((_selectedCell!!.cell.Value == number && number != 0) || number == 0){
+                SetValue(_selectedCell!!.cell.Index, 0)
+                _selectedCell!!.SetNumber(0)
+                numbersLeft++
+            } else {
+                SetValue(_selectedCell!!.cell.Index, number)
+                _selectedCell!!.SetNumber(number)
+                numbersLeft--
+            }
+        }
     }
     //</editor-fold>
 
@@ -88,7 +95,7 @@ class SudokuGameManager {
         GenerateCells(context, attributeSet)
     }
 
-    fun SaveGame(): Boolean {
+    fun SaveGame(time: Long): Boolean {
         try {
             val filePath: String = context.filesDir.path + SAVE_FILE_NAME
             Log.d("SudokuGameManager", "Saving game to: $filePath")
@@ -97,6 +104,7 @@ class SudokuGameManager {
             file.createNewFile()
 
             file.appendText("<SudokuGameManager>")
+            file.appendText(XmlParser.ToXml("time", time))
             file.appendText(XmlParser.ToXml("_difficulty", _difficulty))
             file.appendText(XmlParser.ToXml("sudokuComplete", sudokuComplete.toTypedArray()))
             file.appendText(XmlParser.ToXml("sudoku", sudoku.toTypedArray()))
@@ -119,12 +127,16 @@ class SudokuGameManager {
 
             val fileText = file.readText()
 
+            var tmpLong: Long = 0
+            var time = XmlParser.FromXml(fileText, "time", tmpLong) ?: throw Exception("time is null!")
+            Log.d("SudokuGameManager", "Time: $time")
             val tmpDifficulty = XmlParser.FromXml(fileText, "_difficulty", _difficulty) ?: throw Exception("difficulty is null!")
             val tmpSudokuComplete = XmlParser.FromXml(fileText, "sudokuComplete", SudokuGameCell().javaClass) ?: throw Exception("sudokuComplete is null!")
             val tmpSudoku = XmlParser.FromXml(fileText, "sudoku", SudokuGameCell().javaClass) ?: throw Exception("sudoku is null!")
             val tmpNumbersLeft = XmlParser.FromXml(fileText, "numbersLeft", numbersLeft) ?: throw Exception("numbersLeft is null!")
 
             this.context = context
+            (context as Game).SetTime(time as Long)
             _difficulty = tmpDifficulty.toString()
             sudokuComplete.addAll(tmpSudokuComplete)
             sudoku.addAll(tmpSudoku)

@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Xml
 import android.view.View
-import android.widget.Toast
 import io.github.ech0_jp.sudoku.R
 import io.github.ech0_jp.sudoku.Util.Statistics.StatisticsManager
 import io.github.ech0_jp.sudoku.game.SudokuGameManager
@@ -34,8 +33,13 @@ class Game : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_game)
-        _startTime = System.currentTimeMillis()
+        if (resume == null || !resume)
+            _startTime = System.currentTimeMillis()
         handler.post(runnable())
+    }
+
+    fun SetTime(time: Long) {
+        _startTime = System.currentTimeMillis() - time
     }
 
     val handler = Handler()
@@ -59,6 +63,7 @@ class Game : AppCompatActivity() {
                 if (file.exists()) file.delete()
                 StatisticsManager.instance.AddEntry(_minutes, _seconds, difficulty)
                 val intent = Intent(this, MainMenu::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                 startActivity(intent)
             }
         })
@@ -68,14 +73,20 @@ class Game : AppCompatActivity() {
 
     fun btn_OnClick(view: View){
         val number: Int = view.tag.toString().toInt()
-        SudokuGameManager.instance.btn_OnClick(number)
+        SudokuGameManager.instance.btn_OnClick(number, tb_Notes.isChecked)
         if (SudokuGameManager.instance.GameComplete())
             GameOver()
     }
 
     override fun onBackPressed() {
-        SudokuGameManager.instance.SaveGame()
+        handler.removeCallbacksAndMessages(null)
+        SudokuGameManager.instance.SaveGame(System.currentTimeMillis() - _startTime)
         val intent = Intent(this, MainMenu::class.java)
         startActivity(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        finish()
     }
 }

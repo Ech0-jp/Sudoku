@@ -18,6 +18,7 @@ class SudokuCell(context: Context, attributes: AttributeSet): View(context, attr
 
     private var _relatedCells: MutableList<SudokuCell> = mutableListOf()
     private var number: String = ""
+    private var notes: MutableList<Int> = mutableListOf()
     var cellSelected: Boolean = false
     var highlightNumber: Boolean = false
 
@@ -41,7 +42,18 @@ class SudokuCell(context: Context, attributes: AttributeSet): View(context, attr
         this.number = number.toString()
         if (number == 0)
             this.number = ""
+        notes.clear()
+        invalidate()
+    }
 
+    fun AddNote(number: Int) {
+        if (cell.Value != 0) return
+
+        if (notes.contains(number))
+            notes.remove(number)
+        else
+            notes.add(number)
+        notes.sort()
         invalidate()
     }
 
@@ -89,10 +101,25 @@ class SudokuCell(context: Context, attributes: AttributeSet): View(context, attr
         paint.textSize = 60F
         paint.style = Paint.Style.FILL
 
-        val rect = Rect()
+        var rect = Rect()
         paint.getTextBounds(number, 0, number.length, rect)
 
         canvas!!.drawText(number, (width - rect.width()) / 2F, (height + rect.height()) / 2F, paint)
+
+
+        paint.color = Color.BLACK
+        paint.textSize = 35F
+        rect = Rect()
+        paint.getTextBounds("1", 0, 1, rect)
+        var yOffset = 0F
+        var xOffset = 0F
+        for ((i, n) in notes.withIndex()) {
+            if ((paint.textSize / 3) + (paint.textSize * (i - xOffset)) + paint.textSize > width) {
+                yOffset += 1F
+                xOffset = i.toFloat()
+            }
+            canvas.drawText(n.toString(), (paint.textSize / 3) + (paint.textSize * (i - xOffset)), paint.textSize + (paint.textSize * yOffset), paint)
+        }
     }
 
     private fun onDraw_SetBorder(canvas: Canvas?) {

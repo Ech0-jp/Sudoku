@@ -13,6 +13,10 @@ class StatisticsManager {
 
     private val SAVE_PATH = "/Statistics"
 
+    private var _initialized: Boolean = false
+    val initialized: Boolean
+        get() = _initialized
+
     private val legacyStatsBeginner: MutableList<StatisticsEntry> = mutableListOf()
     private val legacyStatsEasy: MutableList<StatisticsEntry> = mutableListOf()
     private val legacyStatsMedium: MutableList<StatisticsEntry> = mutableListOf()
@@ -45,11 +49,6 @@ class StatisticsManager {
             val file: File = File(filePath)
             if (!file.exists()) return
 
-            val lines = file.readLines()
-            for ( l in lines ) {
-                Log.d("StatisticsManager", l)
-            }
-
             val fileText = file.readText()
 
             val tmpLegacyStatsBeginner = XmlParser.FromXml(fileText, "legacyStatsBeginner", StatisticsEntry().javaClass)
@@ -75,12 +74,15 @@ class StatisticsManager {
             if (tmpStatsMedium != null && tmpStatsMedium.isNotEmpty()) statsMedium.addAll(tmpStatsMedium)
             if (tmpStatsHard != null && tmpStatsHard.isNotEmpty()) statsHard.addAll(tmpStatsHard)
             if (tmpStatsExpert != null && tmpStatsExpert.isNotEmpty()) statsExpert.addAll(tmpStatsExpert)
+
+            _initialized = true
         } catch (e: Exception) {
             Log.e("StatisticsManager", "Failed to load stats..\n${e.message}")
         }
     }
 
     fun AddEntry(minutes: Int, seconds: Int, difficulty: String) {
+        Log.d("StatisticsManager", "Adding new entry: minutes=$minutes, seconds=$seconds, difficulty=$difficulty")
         when (difficulty) {
             "Beginner" -> legacyStatsBeginner.add(StatisticsEntry(minutes, seconds))
             "Easy" -> legacyStatsEasy.add(StatisticsEntry(minutes, seconds))
@@ -91,6 +93,7 @@ class StatisticsManager {
     }
 
     fun AddEntry(minutes: Int, seconds: Int, score: Int, difficulty: String){
+        Log.d("StatisticsManager", "Adding new entry: minutes=$minutes, seconds=$seconds, score=$score, difficulty=$difficulty")
         when (difficulty) {
             "Beginner" -> statsBeginner.add(StatisticsEntry(minutes, seconds, score))
             "Easy" -> statsEasy.add(StatisticsEntry(minutes, seconds, score))

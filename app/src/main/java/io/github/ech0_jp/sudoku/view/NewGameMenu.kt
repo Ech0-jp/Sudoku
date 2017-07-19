@@ -18,6 +18,7 @@ class NewGameMenu : AppCompatActivity() {
     fun GameDifficulty_OnClick(view: View): Unit {
         val difficulty = (view as Button).text
         val intent = Intent(this, Game::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         intent.putExtra("difficulty", difficulty)
         startActivity(intent)
     }

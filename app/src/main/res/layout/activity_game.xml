@@ -20,6 +20,19 @@
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp" />
 
+    <ToggleButton
+        android:id="@+id/tb_Notes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Notes"
+        android:textOff="Notes"/>
+
+    <LinearLayout
+        android:id="@+id/LinearButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
